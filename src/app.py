@@ -12,7 +12,7 @@ PROJECT_ROOT = CURRENT_DIR  # since we keep modules in the same folder
 if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
-from config import APP_TITLE, APP_DESCRIPTION, CHROMA_DIR, GEMINI_MODEL
+from config import APP_TITLE, APP_DESCRIPTION, GEMINI_MODEL
 from ingest import ingest_files, get_retriever, get_vectorstore
 from graph import build_rag_graph, run_rag
 from utils import ensure_dir
@@ -24,7 +24,6 @@ st.set_page_config(page_title=APP_TITLE, page_icon="📚", layout="wide")
 # ---------- Sidebar Config ----------
 with st.sidebar:
     st.header("⚙️ Settings")
-    chroma_dir = st.text_input("Chroma directory", value=CHROMA_DIR)
     model_name = st.text_input("Gemini chat model", value=GEMINI_MODEL, help="e.g., gemini-1.5-flash or gemini-1.5-pro")
     stream_mode = st.toggle("Stream responses", value=True)
     st.caption("Default model: gemini-1.5-flash")
@@ -32,8 +31,7 @@ with st.sidebar:
 st.title(APP_TITLE)
 st.caption(APP_DESCRIPTION)
 
-# Ensure directories
-ensure_dir(chroma_dir)
+# Ensure directories (uploads, chats)
 uploads_root = os.path.join(".", "uploads")
 ensure_dir(upload_root := uploads_root)
 
@@ -80,7 +78,7 @@ with st.expander("📤 Upload and Ingest Documents", expanded=True):
         - Tune per document size and question style.
         """)
 
-    ingest_btn = st.button("Ingest to Chroma", type="primary", use_container_width=True)
+    ingest_btn = st.button("Ingest to Pinecone", type="primary", use_container_width=True)
 
     if ingest_btn:
         if not uploaded:
@@ -95,14 +93,12 @@ with st.expander("📤 Upload and Ingest Documents", expanded=True):
             with st.spinner("Embedding and indexing documents... this may take a moment"):
                 used_dir = ingest_files(
                     file_paths,
-                    persist_dir=chroma_dir,
                     chunk_size=int(chunk_size),
                     chunk_overlap=int(chunk_overlap),
                 )
             st.success(f"Ingested {len(file_paths)} files into {used_dir}")
 
 st.divider()
-
 
 # Initialize chat sessions
 if "chats" not in st.session_state:
@@ -210,8 +206,8 @@ user_msg = st.chat_input("Message your knowledge base...")
 if user_msg:
     # Ensure VS/retriever exists
     try:
-        retriever = get_retriever(chroma_dir)
-        vs = get_vectorstore(chroma_dir)
+        retriever = get_retriever()
+        vs = get_vectorstore()
     except Exception as e:
         with st.chat_message("assistant"):
             st.error(str(e))

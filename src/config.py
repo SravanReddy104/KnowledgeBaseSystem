@@ -18,7 +18,6 @@ def _get_secret(name: str, default: str | None = None):
 
 
 # Directories
-CHROMA_DIR = _get_secret("CHROMA_DIR", "./chroma_db")
 UPLOAD_DIR = _get_secret("UPLOAD_DIR", "./uploads")
 
 # Models
@@ -27,10 +26,17 @@ GEMINI_EMBED_MODEL = _get_secret("GEMINI_EMBED_MODEL", "models/embedding-001")
 
 # Keys
 GOOGLE_API_KEY = _get_secret("GOOGLE_API_KEY")
+PINECONE_API_KEY = _get_secret("PINECONE_API_KEY")
+
+# Pinecone
+PINECONE_INDEX = _get_secret("PINECONE_INDEX", "kb-index")
+# For serverless index creation (defaults suitable for free tier)
+PINECONE_CLOUD = _get_secret("PINECONE_CLOUD", "aws")
+PINECONE_REGION = _get_secret("PINECONE_REGION", "us-east-1")
 
 # App
 APP_TITLE = _get_secret("APP_TITLE", "Knowledge Base Agent")
 APP_DESCRIPTION = _get_secret(
     "APP_DESCRIPTION",
-    "Upload docs, embed to Chroma, and chat using Gemini (LangChain + LangGraph)",
+    "Upload docs, embed to Pinecone, and chat using Gemini (LangChain + LangGraph)",
 )
