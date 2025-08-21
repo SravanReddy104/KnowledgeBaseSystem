@@ -15,4 +15,4 @@ python-dotenv>=1.0.1
 psutil>=5.9.8
 pydantic>=2.7.4
 langchain-pinecone>=0.1.1
-pinecone-client>=5.0.1
+pinecone>=5.0.0
